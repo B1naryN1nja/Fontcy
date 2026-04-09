@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!--Wow! You actually opened the source file! Feel free to mod it and have a wonderful day :)-->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fontcy</title>
@@ -61,7 +62,7 @@
     <p>Fontcy is the one stop shop for all things fancy fonts. So go ahead! Jump to it, type out some text! Click a square to copy it...</p>
     <textarea id="input" placeholder="Type your text here...">The Quick Brown Fox</textarea>
     <div class="output" id="output"></div>
-    <p>Don't see the fancy font you want? Open an <a href="https://github.com/B1naryN1nja/Fontcy">issue on the GitHub page</a> or <a href="https://www.reddit.com/user/B1naryN1nja/">DM me on Reddit!</a></p>
+    <p>Don't see the fancy font you want? Open an <a href="https://github.com/B1naryN1nja/Fontcy/issues">issue on the GitHub page</a> or <a href="https://www.reddit.com/user/B1naryN1nja/">DM me on Reddit!</a></p>
 
     <script>
         const alpha = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
@@ -86,6 +87,14 @@
             "Fancy 1": f("ąҍçժҽƒցհìʝҟӀʍղօքզɾʂէմѵա×վՀȺBCDEℱGHIJKLMNOPQRSƬUVWXYƵ"),
             "Curvy": f("αႦƈԃҽϝɠԋιʝƙʅɱɳσρϙɾʂɬυʋɯxყȥABCDEFGHIJKLMNOPQRSTUVWXYZ"),
             "Gothic Look": f("thє quíck brσwn fσх jumps σvєr thє lαzч dσgABCDEFGHIJKLMNOPQRSTUVWXYZ")
+            /*
+                You can easily add more to this array by simply adding this:
+
+                "Name of Font": f("thє quíck brσwn fσх jumps σvєr thє lαzч dσgABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
+                Replace the "Name of Font" text with the name of the font and replace "idk" in f("idk") with the unicode chars of the font. Easy!
+
+            */
         };
 
         function translate(text, mapping) {
