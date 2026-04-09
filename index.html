@@ -1,1 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fontcy</title>
+    <link href="https://googleapis.com" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans', sans-serif; background: #fafafa; padding: 20px; max-width: 900px; margin: auto; }
+        h1 { text-align: center; color: #333; }
+        textarea { width: 100%; height: 80px; padding: 15px; border: 2px solid #ddd; border-radius: 8px; font-size: 1.2rem; margin-bottom: 20px; box-sizing: border-box; outline: none; }
+        textarea:focus { border-color: #007bff; }
+        .output { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; }
+        .font-box { background: white; border: 1px solid #eee; padding: 15px; border-radius: 8px; cursor: pointer; transition: 0.2s; position: relative; overflow: hidden; }
+        .font-box:hover { border-color: #007bff; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .label { font-size: 0.75rem; font-weight: bold; color: #888; text-transform: uppercase; margin-bottom: 8px; display: flex; justify-content: space-between; }
+        .text { font-size: 1.2rem; word-break: break-all; min-height: 1.5em; color: #222; }
+        .copied-badge { position: absolute; top: 0; right: 0; background: #28a745; color: white; padding: 2px 8px; font-size: 10px; transform: translateY(-100%); transition: 0.2s; }
+        .font-box.copied .copied-badge { transform: translateY(0); }
+    </style>
+</head>
+<body>
+    <h1>Welcome to Fontcy</h1>
+    <p>Type some text below to get started...</p>
+    <textarea id="input" placeholder="Type your text here...">The Quick Brown Fox</textarea>
+    <div class="output" id="output"></div>
 
+    <script>
+        const alpha = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+        
+        const f = (str) => Array.from(str);
+        const styles = {
+            "Bold Sans": f("𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆🇿𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝗤𝗥𝗦𝗧𝗨𝗩𝗪𝗫𝗬𝗭"),
+            "Italic Sans": f("𝘢𝘣𝘤𝘥𝘦𝘧𝘨𝘩𝘪𝘫𝘬𝘭𝘮𝘯𝘰𝘱𝘲𝘳𝘴𝘵𝘶𝘷𝘸𝘹𝘺𝘻𝘈𝘉𝘊𝘋𝘌𝘍𝘎𝘏𝘐𝘑𝘒𝘓𝘔𝘕𝘖𝘗𝘘𝘙𝘚𝘛𝘜𝘝𝘞𝘟𝘠𝘡"),
+            "Bold Italic Sans": f("𝙖𝙗𝙘𝙙𝙚𝙛𝙜𝙝𝙞𝙟𝙠𝙡𝙢𝙣𝙤𝙥𝙦𝙧𝙨𝙩𝙪𝙫𝙬𝙭𝙮𝙯𝘼𝘽𝘾𝘿𝙀𝙁𝙂𝙃𝙄𝙅𝙆𝙇𝙈𝙉𝙊𝙋𝙌𝙍𝙎𝙏𝙐𝙑𝙒𝙓𝙔𝙕"),
+            "Monospace": f("𝚊𝚋𝚌𝚍𝚎𝚏𝚐𝚑𝚒𝚓𝚔𝚕𝚖𝚗𝚘𝚙𝚚𝚛𝚜𝚝𝚞𝚟𝚠𝚡𝚢𝚣𝙰𝙱𝙲𝙳𝙴𝙵𝙶𝙷𝙸𝙹𝙺𝙻𝙼𝙽𝙾𝙿𝚚𝚁𝚂𝚃𝚄𝚅𝚆𝚇𝚈𝚉"),
+            "Script": f("𝒶𝒷𝒸𝒹𝑒𝒻𝑔𝒽𝒾𝒿𝓀𝓁𝓂𝓃𝑜𝓅𝓆𝓇𝓈𝓉𝓊𝓋𝓌𝓍𝓎𝓏𝒜ℬ𝒞𝒟ℰℱ𝒢ℋℐ𝒥𝒦ℒℳ𝒩𝒪𝒫𝒬ℛ𝒮𝒯𝒰𝒱𝒲𝒳𝒴𝒵"),
+            "Bold Script": f("𝓪𝓫𝓬𝓭𝓮𝓯𝓰𝓱𝓲𝓳𝓴𝓵𝓶𝓷𝓸𝓹𝓺𝓻𝓼𝓽𝓾𝓿𝔀𝔁𝔂𝔃𝓐𝓑𝓒𝓓𝓔𝓕𝓖𝓗𝓘𝓙𝓚𝓛𝓜𝓝𝓞𝓟𝓠𝓡𝓢𝓣𝓤𝓥𝓦𝓧𝓨𝓩"),
+            "Fraktur": f("𝔞𝔟𝔠𝔡𝔢𝔣𝔤𝔥𝔦𝔧𝔨𝔩𝔪𝔫𝔬𝔭𝔮𝔯𝔰𝔱𝔲𝔳𝔴𝔵𝔶𝔷𝔄𝔅ℭ𝔇𝔈𝔉𝔊ℌℑ𝔍𝔎𝔏𝔐𝔑𝔒𝔓𝔔ℜ𝔖𝔗𝔲𝔙𝔚𝔛𝔜ℨ"),
+            "Bold Fraktur": f("𝖆𝖇𝖈𝖉𝖊𝖋𝖌𝖍𝖎𝖏𝖐𝖑𝖒𝖓𝖔𝖕𝖖𝖗𝖘𝖙𝖚𝖛𝖜𝖝𝖞𝖟𝕬𝕭𝕮𝕯𝕰𝕱𝕲𝕳𝕴𝕵𝕶𝕷𝕸𝕹𝕺𝕻𝕼𝕽𝕾𝕿𝖀𝖁𝖂𝖃𝖄𝖅"),
+            "Double Struck": f("𝕒𝕓𝕔𝕕𝕖𝕗𝕘𝕙𝕚𝕛𝕜𝕝𝕞𝕟𝕠𝕡𝕢𝕣𝕤𝕥𝕦𝕧𝕨𝕩𝕪𝕫𝔸𝔹ℂ𝔻𝔼𝔽𝔾ℍ𝕀𝕁𝕂𝕃𝕄ℕ𝕆ℙℚℝ𝕊𝕋𝕌𝕍𝕎𝕏𝕐ℤ"),
+            "Small Caps": f("ᴀʙᴄᴅᴇғɢʜɪᴊᴋʟᴍɴᴏᴘǫʀsᴛᴜᴠᴡxʏᴢABCDEFGHIJKLMNOPQRSTUVWXYZ"),
+            "Bubble": f("ⓐⓑⓒⓓⓔⓕⓖⓗⓘⓙⓚⓛⓜⓝⓞⓟⓠⓡⓢⓣⓤⓥⓦⓧⓨⓩⒶⒷⒸⒹⒺⒻⒼⒽⒾⒿⓀⓁⓂⓃⓄⓅⓆⓇⓈⓉⓊⓋⓌⓍⓎⓏ"),
+            "Negative Bubble": f("🅐🅑🅒🅓🅔🅕🅖🅗🅘🅙🅚🅛🅜🅝🅞🅟🅠🅡🅢🅣🅤🅥🅦🅧🅨🅩🅐🅑🅒🅓🅔🅕🅖🅗🅘🅙🅚🅛🅜🅝🅞🅟🅠🅡🅢🅣🅤🅥🅦🅧🅨🅩"),
+            "Squared": f("🄰🄱🄲🄳🄴🄵🄶🄷🄸🄹🄺🄻🄼🄽🄾🄿🅀🅁🅂🅃🅄🅅🅿🅇🅈🅉🄰🄱🄲🄳🄴🄵🄶🄷🄸🄹🄺🄻🄼🄽🄾🄿🅀🅁🅂🅃🅄🅅🅿🅇🅈🅉"),
+            "Negative Square": f("🅰🅱🅲🅳🅴🅵🅶🅷🅸🅙🅚🅻🅼🅽🅾🅿🆀🆁🆂🆃🆄🆅🆆🆇🆈🆉🅰🅱🅲🅳🅴🅵🅶🅷🅸🅙🅚🅻🅼🅽🅾🅿🆀🆁🆂🆃🆄🆅🆆🆇🆈🆉"),
+            "Wide / Fullwidth": f("ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ"),
+            "Fancy 1": f("ąҍçժҽƒցհìʝҟӀʍղօքզɾʂէմѵա×վՀȺBCDEℱGHIJKLMNOPQRSƬUVWXYƵ"),
+            "Curvy": f("αႦƈԃҽϝɠԋιʝƙʅɱɳσρϙɾʂɬυʋɯxყȥABCDEFGHIJKLMNOPQRSTUVWXYZ"),
+            "Gothic Look": f("thє quíck brσwn fσх jumps σvєr thє lαzч dσgABCDEFGHIJKLMNOPQRSTUVWXYZ"),
+            "Greek Style": f("αḅͼḍεfgḥḭjḳḷṃṇὄṗqṛṡṭüvẇẋẏẓABCDEFGHIJKLMNOPQRSTUVWXYZ"),
+            "Magic": f("🔮 hℯllℴ ℊℴ𝓇ℊℯℴ𝓊𝓈 🔮ABCDEFGHIJKLMNOPQRSTUVWXYZ"),
+            "Arrow Under": f("a̰b̰c̰d̰ḛf̰g̰h̰ḭj̰k̰l̰m̰n̰o̰p̰q̰r̰s̰t̰ṵv̰w̰x̰y̰z̰A̰B̰C̰D̰ḚF̰G̰H̰ḬJ̰K̰L̰M̰N̰O̰P̰Q̰R̰S̰T̰ṴV̰W̰X̰Y̰Z̰"),
+        };
+
+        function translate(text, mapping) {
+            return text.split("").map(char => {
+                const idx = alpha.indexOf(char);
+                return idx !== -1 ? (mapping[idx] || char) : char;
+            }).join("");
+        }
+
+        function render() {
+            const val = document.getElementById("input").value;
+            const container = document.getElementById("output");
+            
+            Object.keys(styles).forEach(name => {
+                let box = document.getElementById("style-" + name.replace(/\s/g, ''));
+                if (!box) {
+                    box = document.createElement("div");
+                    box.className = "font-box";
+                    box.id = "style-" + name.replace(/\s/g, '');
+                    box.innerHTML = `<div class="copied-badge">COPIED</div><div class="label">${name}</div><div class="text"></div>`;
+                    box.onclick = () => {
+                        navigator.clipboard.writeText(box.querySelector('.text').innerText);
+                        box.classList.add('copied');
+                        setTimeout(() => box.classList.remove('copied'), 1000);
+                    };
+                    container.appendChild(box);
+                }
+                box.querySelector('.text').innerText = translate(val, styles[name]);
+            });
+        }
+
+        document.getElementById("input").addEventListener("input", render);
+        render();
+    </script>
+</body>
+</html>
