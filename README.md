@@ -8,4 +8,6 @@ Fontcy is built entirely for the modern web using HTML, CSS, and JavaScript. I a
 # Core Features
 
 - Ad free, always free
-- Tons of fonts, but none that are broken, or simply unnecessary. 
+- Tons of fonts, but none that are broken, or simply unnecessary.
+- Simple UI, with easy-to-find fonts at hand.
+- Open-sourced with MIT, so people can mod it.
